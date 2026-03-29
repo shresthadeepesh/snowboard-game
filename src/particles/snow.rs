@@ -8,6 +8,7 @@ pub fn spawn_snow(
     mut commands: Commands,
     time: Res<Time>,
     mut timers: ResMut<SpawnTimers>,
+    game_data: Res<GameData>,
 ) {
     timers.snow_timer.tick(time.delta());
     if !timers.snow_timer.just_finished() {
@@ -15,24 +16,38 @@ pub fn spawn_snow(
     }
 
     let mut rng = rand::thread_rng();
-    let x = rng.gen_range(-WINDOW_WIDTH / 2.0..WINDOW_WIDTH / 2.0);
-    let size = rng.gen_range(2.0..6.0);
-    let drift = rng.gen_range(-30.0..30.0);
-    let alpha = rng.gen_range(0.3..0.8);
 
-    commands.spawn((
-        SpriteBundle {
-            sprite: Sprite {
-                color: Color::srgba(1.0, 1.0, 1.0, alpha),
-                custom_size: Some(Vec2::new(size, size)),
+    // Dynamic density: spawn more particles at higher speeds (blizzard effect)
+    let speed_ratio = ((game_data.scroll_speed - BASE_SCROLL_SPEED)
+        / (MAX_SCROLL_SPEED - BASE_SCROLL_SPEED))
+        .clamp(0.0, 1.0);
+    let particle_count = 1 + (speed_ratio * 3.0) as u32; // 1-4 particles per tick
+
+    for _ in 0..particle_count {
+        let x = rng.gen_range(-WINDOW_WIDTH / 2.0..WINDOW_WIDTH / 2.0);
+        let size = rng.gen_range(2.0..6.0 + speed_ratio * 2.0);
+        let base_drift = rng.gen_range(-30.0..30.0);
+        // Higher speed = more horizontal wind drift
+        let wind_drift = base_drift + speed_ratio * rng.gen_range(-40.0..40.0);
+        let alpha = rng.gen_range(0.3..0.8);
+
+        commands.spawn((
+            SpriteBundle {
+                sprite: Sprite {
+                    color: Color::srgba(1.0, 1.0, 1.0, alpha),
+                    custom_size: Some(Vec2::new(size, size)),
+                    ..default()
+                },
+                transform: Transform::from_xyz(x, -WINDOW_HEIGHT / 2.0 - 10.0, 20.0),
                 ..default()
             },
-            transform: Transform::from_xyz(x, -WINDOW_HEIGHT / 2.0 - 10.0, 20.0),
-            ..default()
-        },
-        SnowParticle { lifetime: rng.gen_range(2.0..4.0), drift },
-        InGame,
-    ));
+            SnowParticle {
+                lifetime: rng.gen_range(2.0..4.0),
+                drift: wind_drift,
+            },
+            InGame,
+        ));
+    }
 }
 
 pub fn update_snow(

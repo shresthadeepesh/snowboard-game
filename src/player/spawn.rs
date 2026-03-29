@@ -1,8 +1,9 @@
 use bevy::prelude::*;
-use crate::components::*;
+use crate::components::{BackgroundStrip, InGame, ParallaxMountain, Player, PlayerPart};
 use crate::constants::*;
 
 pub fn spawn_background(commands: &mut Commands) {
+    // Snow ground strips
     for i in 0..20 {
         let y = -WINDOW_HEIGHT / 2.0 + i as f32 * 50.0;
         let shade = 0.88 + (i as f32 * 0.005);
@@ -17,6 +18,100 @@ pub fn spawn_background(commands: &mut Commands) {
                 ..default()
             },
             BackgroundStrip,
+            InGame,
+        ));
+    }
+
+    // ── Parallax mountain backdrop ──
+    // Far mountains: base sits at top edge, peaks extend above (clipped by window)
+    let top = WINDOW_HEIGHT / 2.0;
+    let mountains_far = [
+        (-280.0, 220.0, 200.0, Color::srgb(0.72, 0.76, 0.84)),
+        (-50.0,  280.0, 260.0, Color::srgb(0.68, 0.73, 0.82)),
+        (200.0,  200.0, 180.0, Color::srgb(0.74, 0.78, 0.86)),
+        (380.0,  240.0, 220.0, Color::srgb(0.70, 0.75, 0.84)),
+    ];
+    for (x, w, h, color) in mountains_far {
+        // Mountain body — centered so bottom half is visible, top half above screen
+        commands.spawn((
+            SpriteBundle {
+                sprite: Sprite { color, custom_size: Some(Vec2::new(w, h)), ..default() },
+                transform: Transform::from_xyz(x, top - 30.0, -3.0),
+                ..default()
+            },
+            ParallaxMountain { speed_factor: 0.02 },
+            InGame,
+        ));
+        // Snow cap at the peak
+        commands.spawn((
+            SpriteBundle {
+                sprite: Sprite {
+                    color: Color::srgba(0.93, 0.95, 1.0, 0.7),
+                    custom_size: Some(Vec2::new(w * 0.4, h * 0.1)),
+                    ..default()
+                },
+                transform: Transform::from_xyz(x, top - 30.0 + h * 0.4, -2.9),
+                ..default()
+            },
+            ParallaxMountain { speed_factor: 0.02 },
+            InGame,
+        ));
+    }
+
+    // Mid hills: fully visible near the top
+    let hills = [
+        (-320.0, 240.0, 80.0, Color::srgb(0.78, 0.82, 0.88)),
+        (-80.0,  300.0, 100.0, Color::srgb(0.76, 0.8, 0.87)),
+        (160.0,  260.0, 90.0, Color::srgb(0.79, 0.83, 0.89)),
+        (370.0,  220.0, 70.0, Color::srgb(0.77, 0.81, 0.88)),
+    ];
+    for (x, w, h, color) in hills {
+        commands.spawn((
+            SpriteBundle {
+                sprite: Sprite { color, custom_size: Some(Vec2::new(w, h)), ..default() },
+                transform: Transform::from_xyz(x, top - 80.0, -2.0),
+                ..default()
+            },
+            ParallaxMountain { speed_factor: 0.05 },
+            InGame,
+        ));
+        // Hill snow dusting
+        commands.spawn((
+            SpriteBundle {
+                sprite: Sprite {
+                    color: Color::srgba(0.92, 0.94, 0.98, 0.5),
+                    custom_size: Some(Vec2::new(w * 0.5, 5.0)),
+                    ..default()
+                },
+                transform: Transform::from_xyz(x, top - 80.0 + h * 0.4, -1.9),
+                ..default()
+            },
+            ParallaxMountain { speed_factor: 0.05 },
+            InGame,
+        ));
+    }
+
+    // Treeline silhouettes: closest layer, just below the hills
+    let treeline = [
+        (-350.0, 140.0, 30.0),
+        (-180.0, 120.0, 25.0),
+        (-30.0,  160.0, 35.0),
+        (130.0,  130.0, 28.0),
+        (280.0,  150.0, 32.0),
+        (420.0,  110.0, 24.0),
+    ];
+    for (x, w, h) in treeline {
+        commands.spawn((
+            SpriteBundle {
+                sprite: Sprite {
+                    color: Color::srgb(0.82, 0.85, 0.9),
+                    custom_size: Some(Vec2::new(w, h)),
+                    ..default()
+                },
+                transform: Transform::from_xyz(x, top - 140.0, -1.0),
+                ..default()
+            },
+            ParallaxMountain { speed_factor: 0.1 },
             InGame,
         ));
     }

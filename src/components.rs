@@ -136,3 +136,27 @@ pub struct CoinCountText;
 /// Marks obstacles already checked for near-miss.
 #[derive(Component)]
 pub struct NearMissChecked;
+
+#[derive(Component)]
+pub struct SideScenery;
+
+#[derive(Component)]
+pub struct IcePatch {
+    pub shimmer_offset: f32,
+}
+
+#[derive(Component)]
+pub struct CarveSpray {
+    pub velocity: Vec2,
+    pub lifetime: f32,
+}
+
+#[derive(Component)]
+pub struct BoostTrail {
+    pub lifetime: f32,
+}
+
+#[derive(Component)]
+pub struct ParallaxMountain {
+    pub speed_factor: f32,
+}
