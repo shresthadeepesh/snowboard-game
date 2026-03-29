@@ -50,9 +50,6 @@ pub struct ScoreText;
 pub struct SpeedText;
 
 #[derive(Component)]
-pub struct FinalScoreText;
-
-#[derive(Component)]
 pub struct TerrainMarker {
     pub drift: f32,
 }
@@ -82,6 +79,60 @@ pub struct BgMusic;
 pub struct SkiSound;
 
 /// Marker for all entities spawned during gameplay.
-/// Simplifies cleanup to a single query.
 #[derive(Component)]
 pub struct InGame;
+
+#[derive(Component)]
+pub struct MainCamera;
+
+#[derive(Component)]
+pub struct CollisionParticle {
+    pub velocity: Vec2,
+    pub lifetime: f32,
+}
+
+#[derive(Component)]
+pub struct FloatingText {
+    pub lifetime: f32,
+    pub max_lifetime: f32,
+    pub rise_speed: f32,
+}
+
+#[derive(Component)]
+pub struct SpeedLine {
+    pub lifetime: f32,
+}
+
+#[derive(Component)]
+pub struct Coin;
+
+#[derive(Component)]
+pub struct PowerUp {
+    pub kind: PowerUpKind,
+}
+
+#[derive(Clone, Copy, PartialEq)]
+pub enum PowerUpKind {
+    Shield,
+    Magnet,
+    SpeedBoost,
+}
+
+#[derive(Component)]
+pub struct ShieldBubble;
+
+#[derive(Component)]
+pub struct MovingObstacle {
+    pub direction: f32,
+    pub speed: f32,
+}
+
+#[derive(Component)]
+pub struct ComboText;
+
+#[derive(Component)]
+pub struct CoinCountText;
+
+/// Marks obstacles already checked for near-miss.
+#[derive(Component)]
+pub struct NearMissChecked;

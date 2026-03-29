@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 use crate::components::*;
 use crate::constants::*;
+use crate::effects::collision_particles::spawn_collision_burst;
 use crate::resources::{GameData, SfxHandles};
 use crate::state::GameState;
 
@@ -22,9 +23,14 @@ fn check_collisions(
     mut next_state: ResMut<NextState<GameState>>,
     mut game_data: ResMut<GameData>,
     existing_overlay: Query<Entity, With<StunnedOverlay>>,
+    shield_query: Query<Entity, With<ShieldBubble>>,
     sfx: Res<SfxHandles>,
 ) {
     if game_data.hit_cooldown > 0.0 {
+        return;
+    }
+    // Speed boost = invincible
+    if game_data.speed_boost_timer > 0.0 {
         return;
     }
 
@@ -46,16 +52,48 @@ fn check_collisions(
                 },
             });
 
+            // Collision particles
+            let midpoint = (player_pos + obstacle_pos) / 2.0;
+            spawn_collision_burst(&mut commands, midpoint);
+
+            // Screen shake
+            game_data.shake_intensity = SHAKE_OBSTACLE_INTENSITY;
+            game_data.shake_timer = SHAKE_OBSTACLE_DURATION;
+
+            // Knockback
+            if distance > 0.1 {
+                game_data.knockback_dir = (player_pos - obstacle_pos).normalize();
+                game_data.knockback_timer = KNOCKBACK_DURATION;
+            }
+
+            // Reset combo
+            game_data.combo_count = 0;
+            game_data.combo_timer = 0.0;
+            game_data.score_multiplier = 1.0;
+
+            // Shield absorbs the hit
+            if game_data.shield_timer > 0.0 {
+                game_data.shield_timer = 0.0;
+                game_data.hit_cooldown = HIT_COOLDOWN;
+                for entity in &shield_query {
+                    if let Some(mut e) = commands.get_entity(entity) { e.despawn(); }
+                }
+                return;
+            }
+
             if game_data.stunned_timer > 0.0 {
+                // Second hit while stunned — game over
                 game_data.yeti_lunge_pending = 1000.0;
                 let final_score = game_data.score as u32;
                 if final_score > game_data.high_score {
                     game_data.high_score = final_score;
                 }
-                next_state.set(GameState::GameOver);
+                game_data.death_timer = DEATH_FREEZE_DURATION;
+                next_state.set(GameState::Dying);
                 return;
             }
 
+            // First hit — stun
             game_data.stunned_timer = STUN_DURATION;
             game_data.hit_cooldown = HIT_COOLDOWN;
             game_data.yeti_lunge_pending = YETI_HIT_LUNGE;
@@ -124,10 +162,10 @@ fn update_stun(
 
     if game_data.stunned_timer <= 0.0 {
         for (entity, _) in &overlay_query {
-            commands.entity(entity).despawn();
+            if let Some(mut e) = commands.get_entity(entity) { e.despawn(); }
         }
         for entity in &stun_text_query {
-            commands.entity(entity).despawn();
+            if let Some(mut e) = commands.get_entity(entity) { e.despawn(); }
         }
     }
 }

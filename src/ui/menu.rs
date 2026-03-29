@@ -1,10 +1,22 @@
 use bevy::prelude::*;
 use crate::components::MenuUI;
 use crate::constants::*;
-use crate::resources::GameData;
+use crate::resources::{DifficultyMode, GameData, PersistentData};
+use crate::persistence;
 use crate::state::GameState;
 
-pub fn setup_menu(mut commands: Commands, game_data: Res<GameData>) {
+pub fn setup_menu(
+    mut commands: Commands,
+    mut game_data: ResMut<GameData>,
+    mut persistent: ResMut<PersistentData>,
+) {
+    // Load persistent data on first menu enter
+    if !persistent.loaded {
+        let save = persistence::load_save();
+        persistent.high_score = save.high_score;
+        persistent.loaded = true;
+    }
+    game_data.high_score = game_data.high_score.max(persistent.high_score);
     // Background
     commands.spawn((
         SpriteBundle {
@@ -94,13 +106,27 @@ pub fn setup_menu(mut commands: Commands, game_data: Res<GameData>) {
         MenuUI,
     ));
 
+    // Difficulty selector
+    commands.spawn((
+        Text2dBundle {
+            text: Text::from_section(
+                format!("Difficulty: {} (1/2/3 to change)", game_data.difficulty.label()),
+                TextStyle { font_size: 20.0, color: Color::srgb(0.35, 0.45, 0.6), ..default() },
+            )
+            .with_justify(JustifyText::Center),
+            transform: Transform::from_xyz(0.0, -215.0, 1.0),
+            ..default()
+        },
+        MenuUI,
+    ));
+
     // High score
     if game_data.high_score > 0 {
         commands.spawn((
             Text2dBundle {
                 text: Text::from_section(format!("High Score: {}", game_data.high_score), TextStyle { font_size: 24.0, color: Color::srgb(0.8, 0.6, 0.1), ..default() })
                     .with_justify(JustifyText::Center),
-                transform: Transform::from_xyz(0.0, -220.0, 1.0),
+                transform: Transform::from_xyz(0.0, -260.0, 1.0),
                 ..default()
             },
             MenuUI,
@@ -139,8 +165,22 @@ fn spawn_menu_snowboarder(commands: &mut Commands, pos: Vec3, scale: f32) {
 pub fn menu_input(
     keyboard: Res<ButtonInput<KeyCode>>,
     mut next_state: ResMut<NextState<GameState>>,
+    mut game_data: ResMut<GameData>,
 ) {
     if keyboard.just_pressed(KeyCode::Space) || keyboard.just_pressed(KeyCode::Enter) {
         next_state.set(GameState::Playing);
+    }
+    // Difficulty selection (rebuilds menu to show updated label)
+    if keyboard.just_pressed(KeyCode::Digit1) {
+        game_data.difficulty = DifficultyMode::Easy;
+        next_state.set(GameState::Menu); // refresh
+    }
+    if keyboard.just_pressed(KeyCode::Digit2) {
+        game_data.difficulty = DifficultyMode::Normal;
+        next_state.set(GameState::Menu);
+    }
+    if keyboard.just_pressed(KeyCode::Digit3) {
+        game_data.difficulty = DifficultyMode::Hard;
+        next_state.set(GameState::Menu);
     }
 }

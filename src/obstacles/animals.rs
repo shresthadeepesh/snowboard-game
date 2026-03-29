@@ -1,18 +1,23 @@
 use bevy::prelude::*;
+use rand::Rng;
 use crate::components::*;
 use crate::constants::*;
 
-pub fn spawn_deer(commands: &mut Commands, pos: Vec3) {
-    commands
-        .spawn((
-            SpriteBundle {
-                sprite: Sprite { color: Color::NONE, ..default() },
-                transform: Transform::from_translation(pos),
-                ..default()
-            },
-            Obstacle { hitbox_radius: 20.0 },
-            InGame,
-        ))
+pub fn spawn_deer(commands: &mut Commands, pos: Vec3, rng: &mut impl Rng) {
+    let mut entity = commands.spawn((
+        SpriteBundle {
+            sprite: Sprite { color: Color::NONE, ..default() },
+            transform: Transform::from_translation(pos),
+            ..default()
+        },
+        Obstacle { hitbox_radius: 20.0 },
+        InGame,
+    ));
+    if rng.gen::<f32>() < ANIMAL_MOVE_CHANCE {
+        let dir = if rng.gen_bool(0.5) { 1.0 } else { -1.0 };
+        entity.insert(MovingObstacle { direction: dir, speed: ANIMAL_MOVE_SPEED });
+    }
+    entity
         .with_children(|parent| {
             parent.spawn((SpriteBundle {
                 sprite: Sprite { color: Color::srgba(0.0, 0.0, 0.0, 0.1), custom_size: Some(Vec2::new(40.0, 10.0)), ..default() },
@@ -61,17 +66,21 @@ pub fn spawn_deer(commands: &mut Commands, pos: Vec3) {
         });
 }
 
-pub fn spawn_rabbit(commands: &mut Commands, pos: Vec3) {
-    commands
-        .spawn((
-            SpriteBundle {
-                sprite: Sprite { color: Color::NONE, ..default() },
-                transform: Transform::from_translation(pos),
-                ..default()
-            },
-            Obstacle { hitbox_radius: 12.0 },
-            InGame,
-        ))
+pub fn spawn_rabbit(commands: &mut Commands, pos: Vec3, rng: &mut impl Rng) {
+    let mut entity = commands.spawn((
+        SpriteBundle {
+            sprite: Sprite { color: Color::NONE, ..default() },
+            transform: Transform::from_translation(pos),
+            ..default()
+        },
+        Obstacle { hitbox_radius: 12.0 },
+        InGame,
+    ));
+    if rng.gen::<f32>() < ANIMAL_MOVE_CHANCE {
+        let dir = if rng.gen_bool(0.5) { 1.0 } else { -1.0 };
+        entity.insert(MovingObstacle { direction: dir, speed: ANIMAL_MOVE_SPEED * 1.3 });
+    }
+    entity
         .with_children(|parent| {
             parent.spawn((SpriteBundle {
                 sprite: Sprite { color: Color::srgba(0.0, 0.0, 0.0, 0.08), custom_size: Some(Vec2::new(20.0, 8.0)), ..default() },

@@ -27,5 +27,9 @@ fn setup_audio(mut commands: Commands, asset_server: Res<AssetServer>) {
         yeti_roar: asset_server.load("yeti_roar.wav"),
         hit: asset_server.load("hit.wav"),
         ski_loop: asset_server.load("ski_loop.wav"),
+        coin: asset_server.load("coin.wav"),
+        powerup: asset_server.load("powerup.wav"),
+        near_miss: asset_server.load("near_miss.wav"),
+        game_over: asset_server.load("game_over.wav"),
     });
 }

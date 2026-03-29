@@ -6,5 +6,7 @@ pub enum GameState {
     Menu,
     Playing,
     Paused,
+    /// Brief freeze after death — shake plays, world visible, then transitions to GameOver.
+    Dying,
     GameOver,
 }

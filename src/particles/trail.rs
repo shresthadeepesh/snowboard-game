@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use rand::Rng;
-use crate::components::{Player, Trail};
+use crate::components::{InGame, Player, Trail};
 use crate::constants::*;
 use crate::resources::{GameData, SpawnTimers};
 
@@ -34,6 +34,7 @@ pub fn spawn_trail(
                 ..default()
             },
             Trail { lifetime: 0.8 },
+            InGame,
         ));
     }
 }
@@ -56,7 +57,7 @@ pub fn update_trails(
         }
 
         if trail.lifetime <= 0.0 {
-            commands.entity(entity).despawn();
+            if let Some(mut e) = commands.get_entity(entity) { e.despawn(); }
         }
     }
 }

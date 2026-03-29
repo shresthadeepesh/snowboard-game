@@ -46,10 +46,11 @@ pub fn update_yeti(
         }
 
         let gap = yeti_tf.translation.y - player_pos.y;
+        let yeti_mult = game_data.difficulty.yeti_speed_multiplier();
 
         if game_data.stunned_timer > 0.0 {
             if gap > YETI_MIN_STUN_GAP {
-                yeti_tf.translation.y -= YETI_STUN_CLOSE_SPEED * dt;
+                yeti_tf.translation.y -= YETI_STUN_CLOSE_SPEED * yeti_mult * dt;
             }
         } else if gap < YETI_COMFORT_GAP {
             yeti_tf.translation.y += YETI_RETREAT_SPEED * dt;
@@ -58,7 +59,7 @@ pub fn update_yeti(
                 yeti_tf.translation.y = player_pos.y + YETI_COMFORT_GAP;
             }
         } else {
-            yeti_tf.translation.y -= YETI_CLOSE_SPEED * dt;
+            yeti_tf.translation.y -= YETI_CLOSE_SPEED * yeti_mult * dt;
         }
 
         // Clamp to screen
@@ -89,11 +90,14 @@ pub fn update_yeti(
         // Catch check
         let distance = yeti_tf.translation.truncate().distance(player_pos.truncate());
         if distance < YETI_CATCH_RADIUS {
+            game_data.shake_intensity = SHAKE_YETI_INTENSITY;
+            game_data.shake_timer = SHAKE_YETI_DURATION;
             let final_score = game_data.score as u32;
             if final_score > game_data.high_score {
                 game_data.high_score = final_score;
             }
-            next_state.set(GameState::GameOver);
+            game_data.death_timer = DEATH_FREEZE_DURATION;
+            next_state.set(GameState::Dying);
             return;
         }
 

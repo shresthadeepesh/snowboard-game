@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use rand::Rng;
-use crate::components::TerrainMarker;
+use crate::components::{InGame, TerrainMarker};
 use crate::constants::*;
 use crate::resources::{GameData, SpawnTimers};
 
@@ -32,6 +32,7 @@ pub fn spawn_terrain_marks(
             ..default()
         },
         TerrainMarker { drift },
+        InGame,
     ));
 }
 
@@ -46,7 +47,7 @@ pub fn update_terrain_marks(
         transform.translation.x += marker.drift * time.delta_seconds();
 
         if transform.translation.y > WINDOW_HEIGHT / 2.0 + 30.0 {
-            commands.entity(entity).despawn();
+            if let Some(mut e) = commands.get_entity(entity) { e.despawn(); }
         }
     }
 }

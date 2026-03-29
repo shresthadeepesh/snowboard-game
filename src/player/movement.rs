@@ -1,16 +1,28 @@
 use bevy::prelude::*;
 use crate::components::Player;
 use crate::constants::*;
+use crate::resources::GameData;
 use crate::state::GameState;
 
 pub fn player_movement(
     keyboard: Res<ButtonInput<KeyCode>>,
     time: Res<Time>,
+    mut game_data: ResMut<GameData>,
     mut query: Query<(&mut Transform, &mut Player)>,
 ) {
     let dt = time.delta_seconds();
 
+    // Apply knockback
+    if game_data.knockback_timer > 0.0 {
+        game_data.knockback_timer -= dt;
+    }
+
     for (mut transform, mut player) in &mut query {
+        // Knockback force
+        if game_data.knockback_timer > 0.0 {
+            transform.translation.x += game_data.knockback_dir.x * KNOCKBACK_FORCE * dt;
+        }
+
         player.sway_timer += dt * IDLE_SWAY_SPEED;
 
         // Intro slide

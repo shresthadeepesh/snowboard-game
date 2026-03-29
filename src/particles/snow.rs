@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use rand::Rng;
-use crate::components::SnowParticle;
+use crate::components::{InGame, SnowParticle};
 use crate::constants::*;
 use crate::resources::{GameData, SpawnTimers};
 
@@ -31,6 +31,7 @@ pub fn spawn_snow(
             ..default()
         },
         SnowParticle { lifetime: rng.gen_range(2.0..4.0), drift },
+        InGame,
     ));
 }
 
@@ -52,7 +53,7 @@ pub fn update_snow(
         }
 
         if particle.lifetime <= 0.0 || transform.translation.y > WINDOW_HEIGHT / 2.0 + 20.0 {
-            commands.entity(entity).despawn();
+            if let Some(mut e) = commands.get_entity(entity) { e.despawn(); }
         }
     }
 }

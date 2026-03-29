@@ -36,4 +36,37 @@ pub fn spawn_hud(commands: &mut Commands) {
         SpeedText,
         InGame,
     ));
+
+    // Combo text (hidden initially)
+    commands.spawn((
+        Text2dBundle {
+            text: Text::from_section(
+                "",
+                TextStyle { font_size: 22.0, color: Color::srgb(0.2, 1.0, 0.5), ..default() },
+            )
+            .with_justify(JustifyText::Center),
+            transform: Transform::from_xyz(0.0, WINDOW_HEIGHT / 2.0 - 25.0, 51.0),
+            ..default()
+        },
+        HudUI,
+        ComboText,
+        InGame,
+    ));
+
+    // Coin count
+    commands.spawn((
+        Text2dBundle {
+            text: Text::from_section(
+                "",
+                TextStyle { font_size: 22.0, color: COLOR_COIN_GOLD, ..default() },
+            )
+            .with_justify(JustifyText::Left),
+            transform: Transform::from_xyz(-WINDOW_WIDTH / 2.0 + 20.0, WINDOW_HEIGHT / 2.0 - 55.0, 51.0),
+            text_anchor: bevy::sprite::Anchor::CenterLeft,
+            ..default()
+        },
+        HudUI,
+        CoinCountText,
+        InGame,
+    ));
 }

@@ -1,9 +1,12 @@
 mod audio;
+mod collectibles;
 mod collision;
 mod components;
 mod constants;
+mod effects;
 mod obstacles;
 mod particles;
+mod persistence;
 mod player;
 mod resources;
 mod scoring;
@@ -12,14 +15,19 @@ mod ui;
 mod yeti;
 
 use bevy::prelude::*;
-use components::{InGame, SkiSound};
+use components::{InGame, MainCamera, SkiSound};
 use constants::*;
-use resources::{GameData, SfxHandles, SpawnTimers};
+use resources::{GameData, PersistentData, SfxHandles, SpawnTimers};
 use state::GameState;
 
 fn main() {
     App::new()
-        .add_plugins(DefaultPlugins.set(WindowPlugin {
+        .add_plugins(DefaultPlugins
+            .set(bevy::log::LogPlugin {
+                filter: "wgpu=error,naga=warn,bevy_ecs::world=error".into(),
+                ..default()
+            })
+            .set(WindowPlugin {
             primary_window: Some(Window {
                 title: "Snow Rider - Escape the Mountain!".into(),
                 resolution: (WINDOW_WIDTH, WINDOW_HEIGHT).into(),
@@ -32,6 +40,7 @@ fn main() {
         .init_state::<GameState>()
         .init_resource::<GameData>()
         .init_resource::<SpawnTimers>()
+        .init_resource::<PersistentData>()
         .add_plugins((
             audio::GameAudioPlugin,
             player::PlayerPlugin,
@@ -40,6 +49,8 @@ fn main() {
             particles::ParticlesPlugin,
             collision::CollisionPlugin,
             scoring::ScoringPlugin,
+            effects::EffectsPlugin,
+            collectibles::CollectiblesPlugin,
             ui::UIPlugin,
         ))
         .add_systems(Startup, setup_camera)
@@ -47,11 +58,34 @@ fn main() {
             OnEnter(GameState::Playing),
             (player::cleanup_game, setup_game).chain(),
         )
+        // Dying state: freeze + shake, then transition to GameOver
+        .add_systems(Update, tick_death_timer.run_if(in_state(GameState::Dying)))
         .run();
 }
 
 fn setup_camera(mut commands: Commands) {
-    commands.spawn(Camera2dBundle::default());
+    commands.spawn((Camera2dBundle::default(), MainCamera));
+}
+
+fn tick_death_timer(
+    mut commands: Commands,
+    time: Res<Time>,
+    mut game_data: ResMut<GameData>,
+    mut next_state: ResMut<NextState<GameState>>,
+    sfx: Res<SfxHandles>,
+) {
+    game_data.death_timer -= time.delta_seconds();
+    if game_data.death_timer <= 0.0 {
+        commands.spawn(AudioBundle {
+            source: sfx.game_over.clone(),
+            settings: PlaybackSettings {
+                mode: bevy::audio::PlaybackMode::Despawn,
+                volume: bevy::audio::Volume::new(0.5),
+                ..default()
+            },
+        });
+        next_state.set(GameState::GameOver);
+    }
 }
 
 fn setup_game(

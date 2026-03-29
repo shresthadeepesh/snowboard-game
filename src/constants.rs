@@ -68,3 +68,93 @@ pub const COLOR_RABBIT_BODY: Color = Color::srgb(0.85, 0.82, 0.78);
 pub const COLOR_RABBIT_EAR: Color = Color::srgb(0.95, 0.75, 0.75);
 pub const COLOR_TRAIL: Color = Color::srgba(0.7, 0.82, 0.95, 0.5);
 pub const COLOR_TITLE: Color = Color::srgb(0.1, 0.3, 0.6);
+pub const COLOR_COIN_GOLD: Color = Color::srgb(1.0, 0.84, 0.0);
+pub const COLOR_COIN_DARK: Color = Color::srgb(0.85, 0.65, 0.0);
+pub const COLOR_SHIELD: Color = Color::srgb(0.3, 0.7, 1.0);
+pub const COLOR_MAGNET: Color = Color::srgb(0.9, 0.3, 0.9);
+pub const COLOR_SPEED_BOOST: Color = Color::srgb(1.0, 0.5, 0.0);
+
+// ── Screen Shake ──────────────────────────────────────────────────────────────
+
+pub const SHAKE_OBSTACLE_INTENSITY: f32 = 6.0;
+pub const SHAKE_OBSTACLE_DURATION: f32 = 0.25;
+pub const SHAKE_YETI_INTENSITY: f32 = 14.0;
+pub const SHAKE_YETI_DURATION: f32 = 0.5;
+pub const SHAKE_DECAY_RATE: f32 = 8.0;
+pub const DEATH_FREEZE_DURATION: f32 = 0.7;
+
+// ── Collision Particles ───────────────────────────────────────────────────────
+
+pub const COLLISION_PARTICLE_COUNT: u32 = 12;
+pub const COLLISION_PARTICLE_SPEED: f32 = 200.0;
+pub const COLLISION_PARTICLE_LIFETIME: f32 = 0.5;
+
+// ── Near-Miss ─────────────────────────────────────────────────────────────────
+
+pub const NEAR_MISS_RADIUS: f32 = 30.0;
+pub const NEAR_MISS_BONUS: f32 = 25.0;
+pub const NEAR_MISS_TEXT_DURATION: f32 = 0.8;
+
+// ── Floating Text ─────────────────────────────────────────────────────────────
+
+pub const FLOATING_TEXT_RISE_SPEED: f32 = 80.0;
+
+// ── Speed Lines ───────────────────────────────────────────────────────────────
+
+pub const SPEED_LINE_THRESHOLD: f32 = 400.0;
+pub const SPEED_LINE_SPAWN_INTERVAL: f32 = 0.02;
+pub const SPEED_LINE_LIFETIME: f32 = 0.3;
+
+// ── Knockback ─────────────────────────────────────────────────────────────────
+
+pub const KNOCKBACK_FORCE: f32 = 120.0;
+pub const KNOCKBACK_DURATION: f32 = 0.15;
+
+// ── Coins ─────────────────────────────────────────────────────────────────────
+
+pub const COIN_SPAWN_CHANCE: f32 = 0.3;
+pub const COIN_COLLECT_RADIUS: f32 = 28.0;
+pub const COIN_SCORE_VALUE: f32 = 50.0;
+pub const COIN_SPIN_SPEED: f32 = 4.0;
+
+// ── Power-Ups ─────────────────────────────────────────────────────────────────
+
+pub const POWERUP_SPAWN_CHANCE: f32 = 0.08;
+pub const POWERUP_COLLECT_RADIUS: f32 = 30.0;
+pub const SHIELD_DURATION: f32 = 8.0;
+pub const MAGNET_DURATION: f32 = 6.0;
+pub const MAGNET_RANGE: f32 = 150.0;
+pub const MAGNET_PULL_SPEED: f32 = 400.0;
+pub const SPEED_BOOST_DURATION: f32 = 5.0;
+pub const SPEED_BOOST_MULTIPLIER: f32 = 1.5;
+
+// ── Combo ─────────────────────────────────────────────────────────────────────
+
+pub const COMBO_TIMEOUT: f32 = 3.0;
+pub const COMBO_MULTIPLIER_PER_5: f32 = 0.25;
+
+// ── Moving Obstacles ──────────────────────────────────────────────────────────
+
+pub const ANIMAL_MOVE_SPEED: f32 = 80.0;
+pub const ANIMAL_MOVE_CHANCE: f32 = 0.5;
+
+// ── Difficulty Ramping ────────────────────────────────────────────────────────
+
+pub const MIN_OBSTACLE_SPAWN_INTERVAL: f32 = 0.25;
+pub const SPAWN_INTERVAL_DECREASE_RATE: f32 = 0.02;
+
+// ── Milestones ────────────────────────────────────────────────────────────────
+
+pub const MILESTONE_DISTANCES: [f32; 4] = [1000.0, 2500.0, 5000.0, 10000.0];
+pub const MILESTONE_TEXT_DURATION: f32 = 2.0;
+
+// ── Difficulty Modes ──────────────────────────────────────────────────────────
+
+pub const EASY_SPAWN_MULTIPLIER: f32 = 1.5;
+pub const EASY_YETI_SPEED_MULT: f32 = 0.6;
+pub const HARD_SPAWN_MULTIPLIER: f32 = 0.7;
+pub const HARD_YETI_SPEED_MULT: f32 = 1.4;
+
+// ── Persistence ───────────────────────────────────────────────────────────────
+
+pub const SAVE_FILE_NAME: &str = "snow_rider_save.json";
