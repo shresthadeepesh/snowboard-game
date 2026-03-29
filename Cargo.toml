@@ -1,0 +1,26 @@
+[package]
+name = "snow_rider"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+bevy = { version = "0.14", default-features = false, features = [
+    "bevy_asset",
+    "bevy_audio",
+    "bevy_core_pipeline",
+    "bevy_render",
+    "bevy_sprite",
+    "bevy_text",
+    "bevy_ui",
+    "bevy_winit",
+    "bevy_state",
+    "multi_threaded",
+    "default_font",
+    "png",
+    "wav",
+] }
+rand = "0.8"
+
+# Enable optimizations for dependencies in dev builds for better performance
+[profile.dev.package."*"]
+opt-level = 2
