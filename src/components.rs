@@ -128,6 +128,13 @@ pub struct MovingObstacle {
 }
 
 #[derive(Component)]
+pub struct HoppingAnimal {
+    pub hop_timer: f32,
+    pub hop_speed: f32,
+    pub hop_height: f32,
+}
+
+#[derive(Component)]
 pub struct ComboText;
 
 #[derive(Component)]

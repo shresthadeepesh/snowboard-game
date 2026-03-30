@@ -13,7 +13,7 @@ impl Plugin for ObstaclePlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
             Update,
-            (spawner::spawn_obstacles, scroll::scroll_obstacles)
+            (spawner::spawn_obstacles, scroll::scroll_obstacles, scroll::animate_hopping)
                 .run_if(in_state(GameState::Playing)),
         );
     }
