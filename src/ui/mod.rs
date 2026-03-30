@@ -16,7 +16,7 @@ impl Plugin for UIPlugin {
             // Menu
             .add_systems(OnEnter(GameState::Menu), (cleanup_game, menu::setup_menu).chain())
             .add_systems(OnExit(GameState::Menu), cleanup::<MenuUI>)
-            .add_systems(Update, menu::menu_input.run_if(in_state(GameState::Menu)))
+            .add_systems(Update, (menu::menu_input, menu::rebuild_menu).chain().run_if(in_state(GameState::Menu)))
             // Paused
             .add_systems(OnEnter(GameState::Paused), pause::setup_paused)
             .add_systems(OnExit(GameState::Paused), cleanup::<PausedUI>)

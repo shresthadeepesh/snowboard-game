@@ -17,7 +17,7 @@ mod yeti;
 use bevy::prelude::*;
 use components::{InGame, MainCamera, SkiSound};
 use constants::*;
-use resources::{GameData, PersistentData, SfxHandles, SpawnTimers};
+use resources::{GameData, MenuState, PersistentData, Settings, SfxHandles, SpawnTimers};
 use state::GameState;
 
 fn main() {
@@ -41,6 +41,8 @@ fn main() {
         .init_resource::<GameData>()
         .init_resource::<SpawnTimers>()
         .init_resource::<PersistentData>()
+        .init_resource::<Settings>()
+        .init_resource::<MenuState>()
         .add_plugins((
             audio::GameAudioPlugin,
             player::PlayerPlugin,
@@ -73,6 +75,7 @@ fn tick_death_timer(
     mut game_data: ResMut<GameData>,
     mut next_state: ResMut<NextState<GameState>>,
     sfx: Res<SfxHandles>,
+    settings: Res<Settings>,
 ) {
     game_data.death_timer -= time.delta_seconds();
     if game_data.death_timer <= 0.0 {
@@ -80,7 +83,7 @@ fn tick_death_timer(
             source: sfx.game_over.clone(),
             settings: PlaybackSettings {
                 mode: bevy::audio::PlaybackMode::Despawn,
-                volume: bevy::audio::Volume::new(0.5),
+                volume: bevy::audio::Volume::new(0.5 * settings.effective_sfx()),
                 ..default()
             },
         });
@@ -93,6 +96,7 @@ fn setup_game(
     mut game_data: ResMut<GameData>,
     mut timers: ResMut<SpawnTimers>,
     sfx: Res<SfxHandles>,
+    settings: Res<Settings>,
 ) {
     if game_data.is_paused_resume {
         game_data.is_paused_resume = false;
@@ -105,7 +109,7 @@ fn setup_game(
             source: sfx.ski_loop.clone(),
             settings: PlaybackSettings {
                 mode: bevy::audio::PlaybackMode::Loop,
-                volume: bevy::audio::Volume::new(0.15),
+                volume: bevy::audio::Volume::new(0.15 * settings.effective_sfx()),
                 ..default()
             },
         },

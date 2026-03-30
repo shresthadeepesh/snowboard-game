@@ -131,7 +131,6 @@ pub struct MovingObstacle {
 pub struct HoppingAnimal {
     pub hop_timer: f32,
     pub hop_speed: f32,
-    pub hop_height: f32,
 }
 
 #[derive(Component)]

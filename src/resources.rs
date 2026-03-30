@@ -180,3 +180,54 @@ pub struct PersistentData {
     pub high_score: u32,
     pub loaded: bool,
 }
+
+#[derive(Resource)]
+pub struct Settings {
+    pub master_volume: f32,  // 0.0 to 1.0
+    pub music_volume: f32,   // 0.0 to 1.0
+    pub sfx_volume: f32,     // 0.0 to 1.0
+}
+
+impl Default for Settings {
+    fn default() -> Self {
+        Self {
+            master_volume: 0.8,
+            music_volume: 0.7,
+            sfx_volume: 0.8,
+        }
+    }
+}
+
+impl Settings {
+    /// Effective volume for music (master * music)
+    pub fn effective_music(&self) -> f32 {
+        self.master_volume * self.music_volume
+    }
+
+    /// Effective volume for SFX (master * sfx)
+    pub fn effective_sfx(&self) -> f32 {
+        self.master_volume * self.sfx_volume
+    }
+}
+
+#[derive(Resource)]
+pub struct MenuState {
+    pub screen: MenuScreenKind,
+    pub cursor: usize,
+}
+
+impl Default for MenuState {
+    fn default() -> Self {
+        Self {
+            screen: MenuScreenKind::Main,
+            cursor: 0,
+        }
+    }
+}
+
+#[derive(Default, PartialEq, Clone, Copy)]
+pub enum MenuScreenKind {
+    #[default]
+    Main,
+    Settings,
+}

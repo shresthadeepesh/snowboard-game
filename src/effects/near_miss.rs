@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use crate::components::*;
 use crate::constants::*;
-use crate::resources::{GameData, SfxHandles};
+use crate::resources::{GameData, Settings, SfxHandles};
 use super::floating_text::spawn_floating_text;
 
 /// Check obstacles that have scrolled past the player for near-misses and dodges.
@@ -9,6 +9,7 @@ pub fn check_near_misses(
     mut commands: Commands,
     player_query: Query<&Transform, With<Player>>,
     sfx: Res<SfxHandles>,
+    settings: Res<Settings>,
     mut obstacle_query: Query<
         (Entity, &Transform, &Obstacle),
         (Without<Player>, Without<NearMissChecked>),
@@ -67,7 +68,7 @@ pub fn check_near_misses(
                 source: sfx.near_miss.clone(),
                 settings: PlaybackSettings {
                     mode: bevy::audio::PlaybackMode::Despawn,
-                    volume: bevy::audio::Volume::new(0.3),
+                    volume: bevy::audio::Volume::new(0.3 * settings.effective_sfx()),
                     ..default()
                 },
             });

@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use crate::components::*;
 use crate::constants::*;
 use crate::effects::collision_particles::spawn_collision_burst;
-use crate::resources::{GameData, SfxHandles};
+use crate::resources::{GameData, Settings, SfxHandles};
 use crate::state::GameState;
 
 pub struct CollisionPlugin;
@@ -25,6 +25,7 @@ fn check_collisions(
     existing_overlay: Query<Entity, With<StunnedOverlay>>,
     shield_query: Query<Entity, With<ShieldBubble>>,
     sfx: Res<SfxHandles>,
+    settings: Res<Settings>,
 ) {
     if game_data.hit_cooldown > 0.0 {
         return;
@@ -47,7 +48,7 @@ fn check_collisions(
                 source: sfx.hit.clone(),
                 settings: PlaybackSettings {
                     mode: bevy::audio::PlaybackMode::Despawn,
-                    volume: bevy::audio::Volume::new(0.5),
+                    volume: bevy::audio::Volume::new(0.5 * settings.effective_sfx()),
                     ..default()
                 },
             });

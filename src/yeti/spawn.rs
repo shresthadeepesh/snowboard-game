@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use crate::components::*;
 use crate::constants::*;
-use crate::resources::{SfxHandles, SpawnTimers};
+use crate::resources::{Settings, SfxHandles, SpawnTimers};
 
 pub fn spawn_yeti(
     mut commands: Commands,
@@ -9,6 +9,7 @@ pub fn spawn_yeti(
     mut timers: ResMut<SpawnTimers>,
     player_query: Query<(&Transform, &Player)>,
     sfx: Res<SfxHandles>,
+    settings: Res<Settings>,
 ) {
     if timers.yeti_spawned {
         return;
@@ -29,7 +30,7 @@ pub fn spawn_yeti(
         source: sfx.yeti_roar.clone(),
         settings: PlaybackSettings {
             mode: bevy::audio::PlaybackMode::Despawn,
-            volume: bevy::audio::Volume::new(0.6),
+            volume: bevy::audio::Volume::new(0.6 * settings.effective_sfx()),
             ..default()
         },
     });

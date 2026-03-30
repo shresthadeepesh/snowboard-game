@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use rand::Rng;
 use crate::components::*;
 use crate::constants::*;
-use crate::resources::{GameData, SpawnTimers, SfxHandles};
+use crate::resources::{GameData, Settings, SpawnTimers, SfxHandles};
 use crate::effects::floating_text::spawn_floating_text;
 
 pub fn spawn_coins(
@@ -60,6 +60,7 @@ pub fn update_coins(
     time: Res<Time>,
     mut game_data: ResMut<GameData>,
     sfx: Res<SfxHandles>,
+    settings: Res<Settings>,
     player_query: Query<&Transform, With<Player>>,
     mut coin_query: Query<(Entity, &mut Transform), (With<Coin>, Without<Player>)>,
 ) {
@@ -110,7 +111,7 @@ pub fn update_coins(
                 source: sfx.coin.clone(),
                 settings: PlaybackSettings {
                     mode: bevy::audio::PlaybackMode::Despawn,
-                    volume: bevy::audio::Volume::new(0.4),
+                    volume: bevy::audio::Volume::new(0.4 * settings.effective_sfx()),
                     ..default()
                 },
             });

@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use crate::components::*;
 use crate::constants::*;
 use crate::persistence;
-use crate::resources::{GameData, PersistentData};
+use crate::resources::{GameData, PersistentData, Settings};
 use crate::state::GameState;
 
 const PANEL_W: f32 = 440.0;
@@ -24,14 +24,23 @@ pub fn setup_game_over(
     mut commands: Commands,
     game_data: Res<GameData>,
     mut persistent: ResMut<PersistentData>,
+    settings: Res<Settings>,
 ) {
-    // Save high score
+    // Save high score and settings
     if game_data.high_score > persistent.high_score {
         persistent.high_score = game_data.high_score;
-        persistence::write_save(&persistence::SaveData {
-            high_score: game_data.high_score,
-        });
     }
+    persistence::write_save(&persistence::SaveData {
+        high_score: persistent.high_score.max(game_data.high_score),
+        master_volume: settings.master_volume,
+        music_volume: settings.music_volume,
+        sfx_volume: settings.sfx_volume,
+        difficulty: match game_data.difficulty {
+            crate::resources::DifficultyMode::Easy => 0,
+            crate::resources::DifficultyMode::Normal => 1,
+            crate::resources::DifficultyMode::Hard => 2,
+        },
+    });
 
     let is_new_best = game_data.score as u32 >= game_data.high_score && game_data.high_score > 0;
 

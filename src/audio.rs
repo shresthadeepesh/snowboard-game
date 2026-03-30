@@ -1,22 +1,23 @@
 use bevy::prelude::*;
 use crate::components::BgMusic;
-use crate::resources::SfxHandles;
+use crate::resources::{Settings, SfxHandles};
 
 pub struct GameAudioPlugin;
 
 impl Plugin for GameAudioPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, setup_audio);
+        app.add_systems(Startup, setup_audio)
+            .add_systems(Update, sync_music_volume);
     }
 }
 
-fn setup_audio(mut commands: Commands, asset_server: Res<AssetServer>) {
+fn setup_audio(mut commands: Commands, asset_server: Res<AssetServer>, settings: Res<Settings>) {
     commands.spawn((
         AudioBundle {
             source: asset_server.load("music.wav"),
             settings: PlaybackSettings {
                 mode: bevy::audio::PlaybackMode::Loop,
-                volume: bevy::audio::Volume::new(0.35),
+                volume: bevy::audio::Volume::new(0.35 * settings.effective_music()),
                 ..default()
             },
         },
@@ -32,4 +33,16 @@ fn setup_audio(mut commands: Commands, asset_server: Res<AssetServer>) {
         near_miss: asset_server.load("near_miss.wav"),
         game_over: asset_server.load("game_over.wav"),
     });
+}
+
+fn sync_music_volume(
+    settings: Res<Settings>,
+    music_query: Query<&AudioSink, With<BgMusic>>,
+) {
+    if !settings.is_changed() {
+        return;
+    }
+    for sink in &music_query {
+        sink.set_volume(0.35 * settings.effective_music());
+    }
 }

@@ -79,7 +79,6 @@ pub fn spawn_rabbit(commands: &mut Commands, pos: Vec3, rng: &mut impl Rng) {
     entity.insert(HoppingAnimal {
         hop_timer: rng.gen::<f32>() * std::f32::consts::TAU,
         hop_speed: 5.0 + rng.gen::<f32>() * 2.0,
-        hop_height: 8.0 + rng.gen::<f32>() * 4.0,
     });
     if rng.gen::<f32>() < ANIMAL_MOVE_CHANCE {
         let dir = if rng.gen_bool(0.5) { 1.0 } else { -1.0 };
